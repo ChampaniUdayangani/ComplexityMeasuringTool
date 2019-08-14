@@ -1,42 +1,70 @@
 package com.exception;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ExceptionHandler {
-	String programStatement;
+	String programLines[];
+	ArrayList<String> programStatements;
 	Pattern pattern;
-	Matcher matcher; 
-	boolean isValidStatement;
+	Matcher matcher;
 	
-	private static final String comment = "(//|/*|\\*)";
+	
+	private static final String comment = "^(//|/*)";
 	private static final String quotation = "(\"|\')";
 	
-	public ExceptionHandler(String programStatement){
-		this.programStatement = programStatement;
-		this.isValidStatement = true;
+	public ExceptionHandler(String programCode){
+		this.programStatements = new ArrayList<String>();
+		this.programLines = programCode.split("\n");
+		
+		for(int count=0; count<programLines.length; count++) {
+			programStatements.add(programLines[count]);
+		}
+		
 	}
-	public void detectComment() {
-		if((programStatement.contains("//")) || (programStatement.contains("/*")) || (programStatement.contains("*"))) {
-			pattern = Pattern.compile(comment);
-			matcher= pattern.matcher(programStatement);
-			if(matcher.find()){
-				this.isValidStatement = false;
-			} 
-			
+	
+	protected void detectComment() {
+		for(int count=0;count<programStatements.size();count++) {
+			if((programStatements.get(count).contains("//")) || (programStatements.get(count).contains("/*")) || (programStatements.get(count).contains("*"))) {
+				pattern = Pattern.compile(comment);
+				matcher= pattern.matcher(programStatements.get(count));
+				if(matcher.find()){
+					programStatements.remove(count);
+					count--;
+				} 
+			}
 		}
 	}
 	
-	public void detectQuotations() {
-		if((programStatement.contains("\"")) || (programStatement.contains("\'"))) {
-			pattern = Pattern.compile(quotation);
-			matcher= pattern.matcher(programStatement);
-			if(matcher.find()){
-				this.isValidStatement = false;
-				System.out.println(isValidStatement);
-			} 
-			
+	protected void detectQuotations() {
+		for(int count=0;count<programStatements.size();count++) {
+			if((programStatements.get(count).contains("\"")) || (programStatements.get(count).contains("\'"))) {	
+				pattern = Pattern.compile(quotation);
+				matcher= pattern.matcher(programStatements.get(count));
+				if(matcher.find()){
+					programStatements.remove(count);
+				} 
+				
+			}
 		}
+	}
+	
+	protected void detectEmptyLine() {
+		for(int count=0;count<programStatements.size();count++) {
+			if((programStatements.get(count).isEmpty())) {	
+				programStatements.remove(count);
+			} 
+		}
+	}
+	
+	public ArrayList<String> handleExceptions() {
+		this.detectComment();
+		this.detectEmptyLine();
+		for(int i=0;i<programStatements.size();i++) {
+			System.out.println(programStatements.get(i));
+		}
+		return programStatements;
 	}
 
 }

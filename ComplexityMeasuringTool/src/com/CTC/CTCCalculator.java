@@ -1,12 +1,12 @@
 package com.CTC;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CTCCalculator {
 	private static CTCCalculator uniqueInstance;
-	String programCode;
-	String [] programStatement;
+	ArrayList<String> programStatements;
 	int weightValue;
 	Pattern pattern;
 	
@@ -16,26 +16,25 @@ public class CTCCalculator {
 	private static final String switchCases = "(case\\s?)";
 	
 	
-	public static CTCCalculator getInstance(String progCode, int currentWeigth) {
+	public static CTCCalculator getInstance(ArrayList<String> programStatements, int currentWeigth) {
 		if(uniqueInstance == null) {
-			uniqueInstance = new CTCCalculator(progCode, currentWeigth);
+			uniqueInstance = new CTCCalculator(programStatements, currentWeigth);
 		}
 		return uniqueInstance;
-		
 	}
+	
 	
 	public int getWeightValue() {
 		return weightValue;
 	}
 
-	CTCCalculator(String programCode, int currentWeightValue){
-		this.programCode = programCode;
-		this.programStatement = programCode.split("\n");
+	CTCCalculator(ArrayList<String> programStatements, int currentWeightValue){
+		this.programStatements = programStatements;
 		this.weightValue = currentWeightValue;
 	}
 	
 	
-	protected void detectControlStructure(String programStatement) {
+	protected void detectConditionalControlStructure(String programStatement) {
 		if(programStatement.contains("if")) {
 			pattern = Pattern.compile("if");
 			Matcher m = pattern.matcher(programStatement);
@@ -74,13 +73,13 @@ public class CTCCalculator {
 		}
 	}
 	
-	protected void detectSwitch(String programStatement[]) {
-		for(int i=0;i<programStatement.length;i++)
-			if(programStatement[i].contains("switch")) {
-				for(int count=i; count<programStatement.length;count++) {
-					if(programStatement[count].contains("case")) {
+	protected void detectSwitch(ArrayList<String> programStatements) {
+		for(int i=0;i<programStatements.size();i++)
+			if(programStatements.get(i).contains("switch")) {
+				for(int count=i; count<programStatements.size();count++) {
+					if(programStatements.get(count).contains("case")) {
 							pattern= Pattern.compile(switchCases);
-							Matcher m = pattern.matcher(programStatement[count]);
+							Matcher m = pattern.matcher(programStatements.get(count));
 							while (m.find()){
 								weightValue +=1;
 							}
@@ -92,13 +91,13 @@ public class CTCCalculator {
 	}
 	
 	public void calculateCTC() {
-		for(int count=0; count<programStatement.length; count++) {
-			this.detectControlStructure(this.programStatement[count]);
-			this.detectIterativeControlStructure(this.programStatement[count]);
-			this.detectOperator(this.programStatement[count]);
-			this.detectCatch(this.programStatement[count]);
+		for(int count=0; count<programStatements.size(); count++) {
+			this.detectConditionalControlStructure(this.programStatements.get(count));
+			this.detectIterativeControlStructure(this.programStatements.get(count));
+			this.detectOperator(this.programStatements.get(count));
+			this.detectCatch(this.programStatements.get(count));
 		}
-		this.detectSwitch(programStatement);
+		this.detectSwitch(programStatements);
 		
 	}
 }
