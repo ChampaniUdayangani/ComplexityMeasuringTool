@@ -9,9 +9,7 @@ public class ExceptionHandler {
 	ArrayList<String> programStatements;
 	Pattern pattern;
 	Matcher matcher;
-	
-	
-	private static final String comment = "^(//|/*)";
+	private static final String comment = "(//|/*)";
 	private static final String quotation = "(\"|\')";
 	
 	public ExceptionHandler(String programCode){
@@ -26,7 +24,7 @@ public class ExceptionHandler {
 	
 	protected void detectComment() {
 		for(int count=0;count<programStatements.size();count++) {
-			if((programStatements.get(count).contains("//")) || (programStatements.get(count).contains("/*")) || (programStatements.get(count).contains("*"))) {
+			if((programStatements.get(count).startsWith("//")) || (programStatements.get(count).startsWith("/*")) || (programStatements.get(count).startsWith("*"))) {
 				pattern = Pattern.compile(comment);
 				matcher= pattern.matcher(programStatements.get(count));
 				if(matcher.find()){
@@ -43,7 +41,7 @@ public class ExceptionHandler {
 				pattern = Pattern.compile(quotation);
 				matcher= pattern.matcher(programStatements.get(count));
 				if(matcher.find()){
-					programStatements.remove(count);
+					//to do
 				} 
 				
 			}

@@ -11,7 +11,8 @@ public class CTCCalculator {
 	Pattern pattern;
 	
 	private static final String operators = "(\\|\\||&&)";
-	private static final String iterativeControlStructures = "(while|do while|for)";
+	private static final String whileStructure = "while ?\\(.+?\\)";
+	private static final String forStructure = "for ?\\(.*?;.*?;.*?\\)";
 	private static final String conditionalControlStructures = "(if|else if)";
 	private static final String switchCases = "(case\\s?)";
 	
@@ -33,6 +34,7 @@ public class CTCCalculator {
 		this.weightValue = currentWeightValue;
 	}
 	
+	CTCCalculator(){}
 	
 	protected void detectConditionalControlStructure(String programStatement) {
 		if(programStatement.contains("if")) {
@@ -41,25 +43,40 @@ public class CTCCalculator {
 			while (m.find()){
 				weightValue +=1;
 			} 
+			
+			this.detectOperator(programStatement, 1);
 		}
+		
 		
 		
 	}
 	
 	protected void detectIterativeControlStructure(String programStatement) {
-			pattern = Pattern.compile(iterativeControlStructures);
+		if(programStatement.startsWith("while")) {
+			pattern = Pattern.compile(whileStructure);
+			Matcher m = pattern.matcher(programStatement);
+			while (m.find()){
+				weightValue +=2;
+			}
+			this.detectOperator(programStatement, 2);
+		}
+		else if(programStatement.startsWith("for")) {
+			pattern = Pattern.compile(forStructure);
 			Matcher m = pattern.matcher(programStatement);
 			while (m.find()){
 				weightValue +=2;
 			} 
+			this.detectOperator(programStatement, 2);
+		}
+			
 	}
 	
-	protected void detectOperator(String programStatement) {
+	protected void detectOperator(String programStatement, int weight) {
 		
 			pattern = Pattern.compile(operators);
 			Matcher m = pattern.matcher(programStatement);
 			while (m.find()){
-				weightValue ++;	
+				weightValue = weightValue+weight;	
 			}
 	}
 	
@@ -94,7 +111,6 @@ public class CTCCalculator {
 		for(int count=0; count<programStatements.size(); count++) {
 			this.detectConditionalControlStructure(this.programStatements.get(count));
 			this.detectIterativeControlStructure(this.programStatements.get(count));
-			this.detectOperator(this.programStatements.get(count));
 			this.detectCatch(this.programStatements.get(count));
 		}
 		this.detectSwitch(programStatements);

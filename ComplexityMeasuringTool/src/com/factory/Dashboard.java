@@ -102,10 +102,10 @@ public class Dashboard {
 				progStatements = eh.handleExceptions();
 				
 				
-//				CTCCalculatorInstance = CTCCalculator.getInstance(programCode, weightValue);
-//				CTCCalculatorInstance.calculateCTC();
-//				weightValue = CTCCalculatorInstance.getWeightValue();
-//				ctc_textField.setText(Integer.toString(weightValue));
+				CTCCalculatorInstance = CTCCalculator.getInstance(progStatements, weightValue);
+				CTCCalculatorInstance.calculateCTC();
+				weightValue = CTCCalculatorInstance.getWeightValue();
+				ctc_textField.setText(Integer.toString(weightValue));
 				
 				
 			}
